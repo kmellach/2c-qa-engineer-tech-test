@@ -1,7 +1,6 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures/fixtures";
 import { AddBookPage } from "../page-objects/addBook.po";
 import { bookBuilder } from "../test-data/books-Data";
-import { HomePage } from "../page-objects/homePage.po";
 import Ajv from "ajv";
 import { Logger } from "../utils/logger";
 import { bookSchema } from "../schema/book.schema";
@@ -9,19 +8,13 @@ import { BookDetailsPage } from "../page-objects/bookDetails.po";
 
 
 test.describe('Add Book Flow using API', () => {
-  let bookDetailsPage: BookDetailsPage;
-  let addBookPage: AddBookPage;
-
-
-  test.beforeEach(async ({ page }) => {
-    addBookPage = new AddBookPage(page);
-
-    bookDetailsPage = new BookDetailsPage(page);
-
+    test.beforeEach(async ({ page }) => {
     await page.goto('/');
-  });
+    await page.waitForLoadState('networkidle');
+  }
+)
 
-  test('Create a book via API and verify UI', async ({ request, page }) => {
+  test('Create a book via API and verify UI', async ({ request, page, bookDetailsPage }) => {
     const ajv = new Ajv();
     const validate = ajv.compile(bookSchema);
 
@@ -54,7 +47,7 @@ test.describe('Add Book Flow using API', () => {
       .toBe(book.genre);
   });
 
-  test('Open a book created by API and open the same on UI, click Add Another Book Navigation', async ({ request, page }) => {
+  test('Open a book created by API and open the same on UI, click Add Another Book Navigation', async ({ request, page , addBookPage, bookDetailsPage}) => {
     const book = bookBuilder();
 
     const response = await request.post('/api/books', { data: book });
@@ -68,12 +61,14 @@ test.describe('Add Book Flow using API', () => {
       page.waitForURL(/\/add-book$/)
     ]);
 
-    expect(page).toHaveURL(/\/add-book$/)
+    await addBookPage.fillForm(book);
+    await addBookPage.submit();
+    await expect(page.getByText('Book Added Successfully')).toBeVisible();
 
   });
 
 
-  test('Should show error when book API fails', async ({ page }) => {
+  test('Should show error when book API fails', async ({ page , addBookPage}) => {
     await page.route('/api/books/*', route => {
       route.fulfill({
         status: 500,
@@ -153,41 +148,29 @@ test.describe('Add Book Flow using API', () => {
 });
 
 test.describe('Responsive - Book Details Page', () => {
+  let bookDetailsPage: BookDetailsPage;
+  let addBookPage: AddBookPage;
 
-  test('should display book details properly on all devices', async ({ page, request }) => {
-    const book = {
-      title: 'Responsive Book',
-      author: 'Test Author'
-    };
 
-    const res = await request.post('/api/books', { data: book });
-    const created = await res.json();
+  test.beforeEach(async ({ page }) => {
+    addBookPage = new AddBookPage(page);
 
-    await page.goto(`/book/${created.id}`);
-
-    await expect(page.locator('h1')).toBeVisible();
-    await expect(page.getByText(`by ${book.author}`)).toBeVisible();
-  });
-
-  test('buttons should be accessible on small screens', async ({ page, request }) => {
-    const res = await request.post('/api/books', {
-      data: { title: 'Test', author: 'Author' }
-    });
-
-    const created = await res.json();
-
-    await page.goto(`/book/${created.id}`);
-
-    await expect(page.getByRole('link', { name: 'Back to Library' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add Another Book' })).toBeVisible();
-  });
-
-  test('should render properly on custom mobile viewport', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 }); // iPhone size
+    bookDetailsPage = new BookDetailsPage(page);
 
     await page.goto('/');
+  });
 
-    await expect(page.getByText('Book Library')).toBeVisible();
+  test('should display book details properly on all devices', async ({ page, request }) => {
+    const book = bookBuilder();
+    const response = await request.post('/api/books', { data: book });
+    const createdBook = await response.json();
+    await page.goto(`/book/${createdBook.id}`);
+    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
+    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.getByText(`by ${book.author}`)).toBeVisible();
+    expect(await bookDetailsPage.isAddAnotherBookDisplayed()).toBeTruthy();
+    expect(await bookDetailsPage.isBackButtonDisplayed()).toBeTruthy();
   });
 
 });

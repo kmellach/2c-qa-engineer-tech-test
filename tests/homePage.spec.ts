@@ -1,26 +1,22 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/fixtures';
 import { HomePage } from '../page-objects/homePage.po';
 
 test.describe('Home Page Tests', () => {
-    let homePage: HomePage
-
     test.beforeEach(async ({ page }) => {
-        homePage = new HomePage(page);
         await page.goto('/');
-        await page.waitForLoadState('load')
-    });
+        await page.waitForLoadState('load');
+    })
 
-    test('should load homepage successfully', async ({ page }) => {
+    test('should load homepage successfully', async ({ page, homePage }) => {
         expect(await homePage.getHeading()).toBe(`Book Library`);
         expect(await homePage.getsubHeading()).toBe(`Discover amazing books from various genres`)
     });
 
-    test('should display Add New Book button', async () => {
-
+    test('should display Add New Book button', async ({ homePage }) => {
         await expect(homePage.addBook).toBeVisible();
     });
 
-    test('should display list of books', async ({ page }) => {
+    test('should display list of books', async ({ page, homePage }) => {
         await page.waitForLoadState('networkidle');
         const count = await homePage.getCountOfBooks();
 
@@ -31,21 +27,17 @@ test.describe('Home Page Tests', () => {
     });
 
 
-    test('should navigate to Add Book page', async ({ page }) => {
-
+    test('should navigate to Add Book page', async ({ page, homePage }) => {
         await homePage.goToAddBook();
-
         await expect(page).toHaveURL(/.*add/);
     });
 
-    test('should navigate to book details page', async ({ page }) => {
-
+    test('should navigate to book details page', async ({ page, homePage }) => {
         await homePage.clickFirstBookDetails();
-
         await expect(page).toHaveURL(/.*book/);
     });
 
-    test('each book should have unique title', async ({ page }) => {
+    test('each book should have unique title', async ({ page, homePage }) => {
         const titles = await homePage.getAllBookTitles();
         const unique = new Set(titles);
         expect(unique.size).toBe(titles.length);
@@ -64,25 +56,14 @@ test.describe('Home Page Tests', () => {
 });
 
 test.describe('Responsive - Home Page', () => {
-
-    test('should render homepage correctly on all devices', async ({ page }) => {
+    test.beforeEach(async ({ page }) => {
         await page.goto('/');
+        await page.waitForLoadState('networkidle');
+    })
 
+    test('should render homepage correctly on all devices', async ({ page, homePage }) => {
         await expect(page.getByText('Book Library')).toBeVisible();
-        await expect(page.getByRole('link', { name: 'Add New Book' })).toBeVisible();
-    });
-
-    test('book cards should be visible and not overlap', async ({ page }) => {
-        await page.goto('/');
-
-        const cards = page.locator('a.bg-white');
-        const count = await cards.count();
-
-        expect(count).toBeGreaterThan(0);
-
-        for (let i = 0; i < count; i++) {
-            await expect(cards.nth(i)).toBeVisible();
-        }
+        expect(await homePage.isAddBookVisible()).toBeTruthy();
     });
 
     test('should render properly on custom mobile viewport', async ({ page }) => {

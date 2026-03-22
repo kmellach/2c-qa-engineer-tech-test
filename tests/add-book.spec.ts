@@ -1,22 +1,17 @@
-import { test, expect } from '@playwright/test';
-import { AddBookPage } from '../page-objects/addBook.po';
-import { HomePage } from '../page-objects/homePage.po';
+import { test, expect } from '../fixtures/fixtures';
 import { bookBuilder, invalidBooks } from '../test-data/books-Data';
 import { errorMessages } from '../errorMessages';
 import { validateErrorMessage } from '../utils/errorMessageValidation';
 
 test.describe('Add Book Flow', () => {
-  let homePage: HomePage;
-  let addBookPage: AddBookPage;
 
-  test.beforeEach(async ({ page }) => {
-    homePage = new HomePage(page);
-    addBookPage = new AddBookPage(page);
+    test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
   });
 
-  test('User can add a new book successfully', async ({ page }) => {
+  test('User can add a new book successfully', async ({  homePage, addBookPage, page  }) => {
     const book = bookBuilder();
 
     await homePage.goToAddBook();
@@ -27,10 +22,11 @@ test.describe('Add Book Flow', () => {
     await Promise.all([
       page.waitForURL(/\/book\/\d+/)
     ]);
+    await page.getByText(book.title).waitFor({ state: 'visible', timeout: 15000 });
     await expect(page.getByText(book.title)).toBeVisible();
   });
 
-  test('Should show validation error when required fields are missing', async () => {
+  test('Should show validation error when required fields are missing', async ({ homePage, addBookPage }) => {
     await homePage.goToAddBook();
 
     await addBookPage.fillForm(invalidBooks.emptyFields);
@@ -43,7 +39,7 @@ test.describe('Add Book Flow', () => {
     expect(message.toLowerCase()).toContain(errorMessages.title.required);
   });
 
-  test('Should allow adding book with only required fields', async ({ page }) => {
+  test('Should allow adding book with only required fields', async ({ homePage, addBookPage, page  }) => {
     const book = {
       title: 'Minimal Book',
       author: 'Test Author',
@@ -57,10 +53,11 @@ test.describe('Add Book Flow', () => {
     await Promise.all([
       page.waitForURL(/\/book\/\d+/)
     ]);
+        await page.getByText(book.title).waitFor({ state: 'visible', timeout: 15000 });
     await expect(page.getByText(book.title)).toBeVisible();
   });
 
-  test('should show validation error when published year is less than 1000', async () => {
+  test('should show validation error when published year is less than 1000', async ({ homePage, addBookPage }) => {
     const invalidBook = bookBuilder(invalidBooks.invalidPublishedYear);
 
     await homePage.goToAddBook();
@@ -76,7 +73,7 @@ test.describe('Add Book Flow', () => {
     ).toBeTruthy();
   });
 
-  test('Should show error for invalid rating', async () => {
+  test('Should show error for invalid rating', async ({ homePage, addBookPage }) => {
     const book = bookBuilder(invalidBooks.invalidRating);
 
     await homePage.goToAddBook();
@@ -87,12 +84,12 @@ test.describe('Add Book Flow', () => {
       (el: HTMLInputElement) => el.validationMessage
     );
     expect(
-      validateErrorMessage(message, errorMessages.publishedYear.min)
+      validateErrorMessage(message, errorMessages.rating.invalid)
     ).toBeTruthy();
   });
 
 
-  test('Form should retain entered values after validation error', async () => {
+  test('Form should retain entered values after validation error', async ({ homePage, addBookPage }) => {
     const book = bookBuilder();
 
     await homePage.goToAddBook();
@@ -107,7 +104,7 @@ test.describe('Add Book Flow', () => {
     await expect(addBookPage.authorInput).toHaveValue(book.author);
   });
 
-  test('Should show correct validation message when pages is 0', async () => {
+  test('Should show correct validation message when pages is 0', async ({ homePage, addBookPage }) => {
     const invalidBook = bookBuilder(invalidBooks.invalidPages);
 
     await homePage.goToAddBook();
@@ -119,11 +116,11 @@ test.describe('Add Book Flow', () => {
     );
 
     expect(
-      validateErrorMessage(message, errorMessages.publishedYear.min)
+      validateErrorMessage(message, errorMessages.pages.min)
     ).toBeTruthy();
   });
 
-  test('should navigate to home page on clicking Cancel after filling form', async ({ page }) => {
+  test('should navigate to home page on clicking Cancel after filling form', async ({ homePage, addBookPage, page }) => {
     const book = bookBuilder();
 
     await homePage.goToAddBook();
@@ -133,7 +130,7 @@ test.describe('Add Book Flow', () => {
     await expect(page.getByText('Book Library')).toBeVisible();
   });
 
-  test('should navigate to home page on clicking Back to Library after filling form', async ({ page }) => {
+  test('should navigate to home page on clicking Back to Library after filling form', async ({ homePage, addBookPage, page }) => {
     await homePage.goToAddBook();
     await addBookPage.clickBackToLibrary();
     await expect(page).toHaveURL('/');
@@ -144,7 +141,7 @@ test.describe('Add Book Flow', () => {
 
 
 test.describe('Responsive - Add Book Page', () => {
-
+//we can pick locators from the po as well. Just showing possibilities
   test('form should be usable on all screen sizes', async ({ page }) => {
     await page.goto('/add-book');
 

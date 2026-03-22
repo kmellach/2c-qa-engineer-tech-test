@@ -48,6 +48,14 @@ export class BookDetailsPage {
     await this.addAnotherBook.click()
   }
 
+  async isBackButtonDisplayed(){
+return await this.backButton.isVisible();
+  }
+
+  async isAddAnotherBookDisplayed(){
+return await this.addAnotherBook.isVisible();
+  }
+
 }
 
 

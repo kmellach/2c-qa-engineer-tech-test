@@ -60,4 +60,8 @@ export class HomePage {
     return this.subHeading.textContent();
   }
 
+  async isAddBookVisible(){
+    return await this.addBook.isVisible();
+  }
+
 }
