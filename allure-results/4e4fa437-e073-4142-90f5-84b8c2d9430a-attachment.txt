@@ -1,0 +1,1 @@
+A snapshot doesn't exist at C:\Users\adity\Test\2c-qa-engineer-tech-test\tests\visualRegression.spec.ts-snapshots\screenshots-book-details-Mobile-Chrome-win32.png, writing actual.

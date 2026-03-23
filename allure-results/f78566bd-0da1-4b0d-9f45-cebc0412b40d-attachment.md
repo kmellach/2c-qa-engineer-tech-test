@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "← Back to Library" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - heading "Visual Book" [level=1] [ref=e10]
+          - paragraph [ref=e11]: by QA
+        - generic [ref=e12]:
+          - generic [ref=e13]: "0"
+          - generic [ref=e14]: ⭐
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]:
+            - heading "Genre" [level=3] [ref=e18]
+            - paragraph [ref=e19]: Unknown
+          - generic [ref=e20]:
+            - heading "Published Year" [level=3] [ref=e21]
+            - paragraph [ref=e22]: "2026"
+          - generic [ref=e23]:
+            - heading "Pages" [level=3] [ref=e24]
+            - paragraph [ref=e25]: 0 pages
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - heading "ISBN" [level=3] [ref=e28]
+            - paragraph [ref=e29]: N/A
+          - generic [ref=e30]:
+            - heading "Rating" [level=3] [ref=e31]
+            - generic [ref=e32]:
+              - generic [ref=e33]:
+                - generic [ref=e34]: ★
+                - generic [ref=e35]: ★
+                - generic [ref=e36]: ★
+                - generic [ref=e37]: ★
+                - generic [ref=e38]: ★
+              - generic [ref=e39]: (0/5)
+      - generic [ref=e40]:
+        - heading "Description" [level=3] [ref=e41]
+        - paragraph [ref=e42]: No description available.
+    - generic [ref=e43]:
+      - link "Back to Library" [ref=e44] [cursor=pointer]:
+        - /url: /
+      - link "Add Another Book" [ref=e45] [cursor=pointer]:
+        - /url: /add-book
+  - button "Open Next.js Dev Tools" [ref=e51] [cursor=pointer]:
+    - img [ref=e52]
+  - alert [ref=e55]
+```
