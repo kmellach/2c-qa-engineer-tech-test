@@ -1,6 +1,6 @@
 import { test, expect } from '../fixtures/fixtures';
 
-test.describe.only('Visual Regression', () => {
+test.describe('Visual Regression', () => {
 
   test('Homepage snapshot', async ({ page }) => {
     await page.goto('/');
