@@ -10,6 +10,14 @@ type Pages = {
 };
 
 export const test = base.extend<Pages>({
+  page: async ({ page, request }, use) => {
+    const response = await request.post('/api/test/reset');
+    if (!response.ok()) {
+      throw new Error(`Failed to reset test data: ${response.status()}`);
+    }
+    await use(page);
+  },
+
   homePage: async ({ page }, use) => {
     const homePage = new HomePage(page);
     await use(homePage);

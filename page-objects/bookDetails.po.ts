@@ -45,7 +45,10 @@ export class BookDetailsPage {
   }
 
   async clickAddAnotherBook(){
-    await this.addAnotherBook.click()
+    await Promise.all([
+      this.page.waitForURL(/\/add-book$/),
+      this.addAnotherBook.click(),
+    ]);
   }
 
   async isBackButtonDisplayed(){

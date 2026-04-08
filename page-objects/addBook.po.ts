@@ -71,12 +71,12 @@ export class AddBookPage {
       }
     }
 
-    if (book.genre) await this.genreDropdown.selectOption(book.genre);
-    if (book.publishedYear)
+    if (book.genre !== undefined) await this.genreDropdown.selectOption(book.genre);
+    if (book.publishedYear !== undefined)
       await this.publishedYearInput.fill(book.publishedYear.toString());
-     if (book.pages)
+    if (book.pages !== undefined)
       await this.pagesInput.fill(book.pages.toString());
-    if (book.rating)
+    if (book.rating !== undefined)
       await this.ratingInput.fill(book.rating.toString());
   }
 
@@ -85,10 +85,16 @@ export class AddBookPage {
   }
 
   async cancel(){
-    await this.cancelButton.click();
+    await Promise.all([
+      this.page.waitForURL('/'),
+      this.cancelButton.click(),
+    ]);
   }
 
   async clickBackToLibrary(){
-    await this.backToLibrary.click()
+    await Promise.all([
+      this.page.waitForURL('/'),
+      this.backToLibrary.click(),
+    ]);
   }
 }

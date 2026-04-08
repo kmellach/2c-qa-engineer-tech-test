@@ -18,11 +18,7 @@ test.describe('Add Book Flow', () => {
     await addBookPage.fillForm(book);
     await addBookPage.submit();
     await expect(page.getByText('Book Added Successfully')).toBeVisible();
-
-    await Promise.all([
-      page.waitForURL(/\/book\/\d+/)
-    ]);
-    await page.getByText(book.title).waitFor({ state: 'visible', timeout: 15000 });
+    await page.waitForURL(/\/book\/\d+/, { timeout: 10000 });
     await expect(page.getByText(book.title)).toBeVisible();
   });
 
@@ -50,10 +46,7 @@ test.describe('Add Book Flow', () => {
     await addBookPage.fillForm(book);
     await addBookPage.submit();
     await expect(page.getByText('Book Added Successfully')).toBeVisible();
-    await Promise.all([
-      page.waitForURL(/\/book\/\d+/)
-    ]);
-        await page.getByText(book.title).waitFor({ state: 'visible', timeout: 15000 });
+    await page.waitForURL(/\/book\/\d+/, { timeout: 10000 });
     await expect(page.getByText(book.title)).toBeVisible();
   });
 
@@ -151,10 +144,12 @@ test.describe('Responsive - Add Book Page', () => {
   });
 
   test('should allow scrolling on small screens', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/add-book');
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
+    await expect.poll(async () => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
     await expect(page.getByRole('button', { name: 'Add Book' })).toBeVisible();
   });
 

@@ -17,7 +17,7 @@ test.describe('Home Page Tests', () => {
     });
 
     test('should display list of books', async ({ page, homePage }) => {
-        await page.waitForLoadState('networkidle');
+        await expect(page.getByText('Loading books...')).toBeHidden();
         const count = await homePage.getCountOfBooks();
 
         for (let i = 0; i < count; i++) {

@@ -14,7 +14,7 @@ export class HomePage {
   }
 
   get bookCards(): Locator {
-    return this.page.locator(`//a[contains(@class , 'bg-white rounded-lg shadow-md')]`);
+    return this.page.locator('a[href^="/book/"]');
   }
 
   get heading(): Locator {
@@ -27,17 +27,23 @@ export class HomePage {
 
   // Dynamic locator 
   bookDetailsLinkByTitle(title: string): Locator {
-    return this.page.locator(`//h3[text()='${title}']/..//a[contains(text(),'View details')]`);
+    return this.page.locator('a[href^="/book/"]').filter({ has: this.page.getByRole('heading', { level: 2, name: title }) });
   }
 
   //Actions
 
   async goToAddBook() {
-    await this.addBook.click();
+    await Promise.all([
+      this.page.waitForURL(/\/add-book$/),
+      this.addBook.click(),
+    ]);
   }
 
   async clickFirstBookDetails() {
-    await this.allViewDetailsLinks.first().click();
+    await Promise.all([
+      this.page.waitForURL(/\/book\/\d+$/),
+      this.allViewDetailsLinks.first().click(),
+    ]);
   }
 
   async clickBookDetailsByTitle(title: string) {
@@ -45,7 +51,7 @@ export class HomePage {
   }
 
   async getAllBookTitles(): Promise<string[]> {
-    return this.page.locator('h3').allTextContents();
+    return this.page.locator('h2').allTextContents();
   }
 
   async getHeading() {

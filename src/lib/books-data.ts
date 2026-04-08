@@ -10,8 +10,7 @@ export interface Book {
   rating: number;
 }
 
-// In-memory storage for books (simulates a database)
-export const booksData: Book[] = [
+const initialBooks: Book[] = [
   {
     id: 1,
     title: "The Great Gatsby",
@@ -69,6 +68,9 @@ export const booksData: Book[] = [
   }
 ];
 
+// In-memory storage for books (simulates a database)
+export const booksData: Book[] = initialBooks.map((book) => ({ ...book }));
+
 // Helper functions for managing books
 export const addBook = (book: Omit<Book, 'id'>): Book => {
   const newBook: Book = {
@@ -85,4 +87,9 @@ export const getBooks = (): Book[] => {
 
 export const getBookById = (id: number): Book | undefined => {
   return booksData.find(book => book.id === id);
+};
+
+export const resetBooks = (): void => {
+  booksData.length = 0;
+  booksData.push(...initialBooks.map((book) => ({ ...book })));
 };

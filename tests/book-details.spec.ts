@@ -32,6 +32,7 @@ test.describe('Add Book Flow using API', () => {
     expect(isValid).toBe(true);
 
     await page.goto(`/book/${createdBook.id}`);
+    await expect(page.getByRole('heading', { level: 1, name: book.title })).toBeVisible();
 
     //Validate with input
     expect(createdBook.title).toBe(book.title);
@@ -57,9 +58,6 @@ test.describe('Add Book Flow using API', () => {
     //Click Add Another Book button 
 
     await bookDetailsPage.clickAddAnotherBook();
-    await Promise.all([
-      page.waitForURL(/\/add-book$/)
-    ]);
 
     await addBookPage.fillForm(book);
     await addBookPage.submit();
